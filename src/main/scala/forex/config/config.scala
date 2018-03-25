@@ -2,13 +2,14 @@ package forex.config
 
 import org.zalando.grafter.macros._
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.{ Duration, FiniteDuration }
 
 @readers
 case class ApplicationConfig(
     akka: AkkaConfig,
     api: ApiConfig,
-    executors: ExecutorsConfig
+    executors: ExecutorsConfig,
+    oneforge: OneforgeConfig
 )
 
 case class AkkaConfig(
@@ -23,4 +24,11 @@ case class ApiConfig(
 
 case class ExecutorsConfig(
     default: String
+)
+
+case class OneforgeConfig(
+    interpreter: String,
+    baseUri: String,
+    cacheTtl: Duration,
+    apiKeys: Seq[String]
 )
