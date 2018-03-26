@@ -11,9 +11,10 @@ import forex.domain.oneforge.{ MarketStatus, Quota, Quote }
 import forex.services.oneforge.Error
 
 trait OneforgeApiBase[F[_]] {
-  def quote(pair: Rate.Pair): F[Either[Error, Quote]]
-  def marketStatus: F[Either[Error, MarketStatus]]
-  def quota: F[Either[Error, Quota]]
+  val oneforgeConfig: OneforgeConfig
+  def quote(apiKey: String, pair: Rate.Pair): F[Either[Error, Quote]]
+  def marketStatus(apiKey: String): F[Either[Error, MarketStatus]]
+  def quota(apiKey: String): F[Either[Error, Quota]]
 }
 
 
@@ -22,7 +23,7 @@ trait OneforgeApiBase[F[_]] {
   *
   * Doc: https://1forge.com/forex-data-api/api-documentation
   */
-class OneforgeApi[F[_]: Monad](oneforgeConfig: OneforgeConfig, httpClient: HttpClient[F]) extends OneforgeApiBase[F] {
+class OneforgeApi[F[_]: Monad](override val oneforgeConfig: OneforgeConfig, httpClient: HttpClient[F]) extends OneforgeApiBase[F] {
 
   /**
     * Get quotes for specific currency pair
@@ -30,8 +31,8 @@ class OneforgeApi[F[_]: Monad](oneforgeConfig: OneforgeConfig, httpClient: HttpC
     * @param pair currency pair
     * @return
     */
-  def quote(pair: Rate.Pair): F[Either[Error, Quote]] = {
-    val uri = uri"${oneforgeConfig.baseUri}/quotes?pairs=${pair.from}${pair.to}&api_key=${oneforgeConfig.apiKeys.head}"
+  override def quote(apiKey: String, pair: Rate.Pair): F[Either[Error, Quote]] = {
+    val uri = uri"${oneforgeConfig.baseUri}/quotes?pairs=${pair.from}${pair.to}&api_key=$apiKey"
     httpClient.getRequest[List[Quote]](uri).map(_.map(_.head))
   }
 
@@ -40,8 +41,8 @@ class OneforgeApi[F[_]: Monad](oneforgeConfig: OneforgeConfig, httpClient: HttpC
     *
     * @return
     */
-  override def marketStatus: F[Either[Error, MarketStatus]] = {
-    val uri = uri"${oneforgeConfig.baseUri}/market_status?api_key=${oneforgeConfig.apiKeys.head}"
+  override def marketStatus(apiKey: String): F[Either[Error, MarketStatus]] = {
+    val uri = uri"${oneforgeConfig.baseUri}/market_status?api_key=$apiKey"
     httpClient.getRequest[MarketStatus](uri) // TODO: Perhaps, if the market is closed, the rate may not change
   }
 
@@ -50,8 +51,8 @@ class OneforgeApi[F[_]: Monad](oneforgeConfig: OneforgeConfig, httpClient: HttpC
     *
     * @return
     */
-  override def quota: F[Either[Error, Quota]] = {
-    val uri = uri"${oneforgeConfig.baseUri}/quota?api_key=${oneforgeConfig.apiKeys.head}"
+  override def quota(apiKey: String): F[Either[Error, Quota]] = {
+    val uri = uri"${oneforgeConfig.baseUri}/quota?api_key=$apiKey"
     httpClient.getRequest[Quota](uri)
   }
 
