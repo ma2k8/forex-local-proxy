@@ -15,3 +15,5 @@ export ONEFORGE_INTERPRETER=live // (dummy|live)
 - add cache(check market status & set 5 min ttl)
 - add logic of check market status
 
+## Sequence diagram
+https://gyazo.com/bb2bc551d66512efe0bb96a5629efce8
