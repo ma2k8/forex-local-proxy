@@ -57,8 +57,6 @@ final class Live[R] private[oneforge] (
 
   implicit val timeout = Timeout(100 milliseconds)
 
-  var apiKeyMaps: Map[String, Quota] = Map.empty
-
   override def get(
       pair: Rate.Pair
   ): Eff[R, Error Either Rate] =
