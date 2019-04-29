@@ -1,0 +1,30 @@
+@startuml{Fig4.2.png}
+title forex-local-proxy-sequence
+hide footbox
+
+participant Processes as P
+participant LiveInterpreter as LI
+participant ApiKeyManager as AM
+participant ForexApi as F
+
+activate P
+
+P -> AM: launch
+activate AM
+
+P -> F: fetch quota
+P -> AM: send quota cache
+P -> LI: launch
+
+deactivate P
+
+activate LI
+
+LI -> AM: findEffectiveKey
+LI -> F: fetch quote
+LI -> F: fetch new quota
+LI -> AM: save new quota
+
+deactivate LI
+
+@enduml
